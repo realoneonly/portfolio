@@ -1,0 +1,1437 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Silence Is Powerful — Volume 1</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400;1,700&family=Lora:ital,wght@0,400;0,500;1,400&family=Bebas+Neue&family=Raleway:wght@200;300;400&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+  :root {
+    --ink: #0d0b09;
+    --paper: #f5f0e8;
+    --paper-dark: #ede8d8;
+    --gold: #c9a84c;
+    --gold-light: #e8d08a;
+    --red: #8b1a1a;
+    --shadow: rgba(0,0,0,0.6);
+  }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: var(--ink);
+    color: var(--paper);
+    font-family: 'Lora', Georgia, serif;
+    overflow-x: hidden;
+    cursor: none;
+  }
+
+  /* Custom cursor */
+  .cursor {
+    position: fixed;
+    width: 12px; height: 12px;
+    background: var(--gold);
+    border-radius: 50%;
+    pointer-events: none;
+    z-index: 9999;
+    mix-blend-mode: screen;
+    transition: transform 0.1s ease;
+  }
+  .cursor-trail {
+    position: fixed;
+    width: 30px; height: 30px;
+    border: 1px solid var(--gold);
+    border-radius: 50%;
+    pointer-events: none;
+    z-index: 9998;
+    opacity: 0.4;
+    transition: transform 0.35s ease, left 0.35s ease, top 0.35s ease;
+  }
+
+  /* ===== CINEMATIC INTRO ===== */
+  #intro {
+    position: fixed;
+    inset: 0;
+    background: #000;
+    z-index: 1000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    overflow: hidden;
+  }
+
+  .film-grain {
+    position: absolute;
+    inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 512 512' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.08'/%3E%3C/svg%3E");
+    pointer-events: none;
+    animation: grain 0.5s steps(2) infinite;
+    opacity: 0.4;
+  }
+  @keyframes grain {
+    0% { transform: translate(0,0); }
+    25% { transform: translate(-2px, 3px); }
+    50% { transform: translate(1px, -1px); }
+    75% { transform: translate(3px, 2px); }
+    100% { transform: translate(0,0); }
+  }
+
+  /* Letterbox bars */
+  .bar-top, .bar-bottom {
+    position: absolute;
+    left: 0; right: 0;
+    background: #000;
+    height: 12%;
+    z-index: 2;
+    transition: height 1.8s cubic-bezier(0.77, 0, 0.175, 1) 3.5s;
+  }
+  .bar-top { top: 0; }
+  .bar-bottom { bottom: 0; }
+  .bars-open .bar-top, .bars-open .bar-bottom { height: 0%; }
+
+  /* Dust particles */
+  .dust { position: absolute; inset: 0; pointer-events: none; overflow: hidden; z-index: 1; }
+  .dust-particle {
+    position: absolute;
+    width: 2px; height: 2px;
+    background: rgba(201, 168, 76, 0.7);
+    border-radius: 50%;
+    animation: dust-float linear infinite;
+  }
+  @keyframes dust-float {
+    from { transform: translateY(100vh) translateX(0) rotate(0deg); opacity: 0; }
+    10% { opacity: 1; }
+    90% { opacity: 0.5; }
+    to { transform: translateY(-10vh) translateX(60px) rotate(360deg); opacity: 0; }
+  }
+
+  .intro-content {
+    position: relative;
+    z-index: 3;
+    text-align: center;
+    opacity: 0;
+    animation: intro-fade-in 2s ease 0.5s forwards;
+  }
+  @keyframes intro-fade-in {
+    from { opacity: 0; transform: scale(1.08); }
+    to { opacity: 1; transform: scale(1); }
+  }
+
+  .intro-tagline {
+    font-family: 'Raleway', sans-serif;
+    font-weight: 200;
+    letter-spacing: 0.5em;
+    font-size: clamp(0.55rem, 1.2vw, 0.85rem);
+    text-transform: uppercase;
+    color: var(--gold);
+    margin-bottom: 1.5rem;
+    opacity: 0;
+    animation: slide-up 1s ease 1.2s forwards;
+  }
+  .intro-title {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(3rem, 10vw, 8rem);
+    font-weight: 900;
+    line-height: 0.9;
+    letter-spacing: -0.02em;
+    color: var(--paper);
+    text-shadow: 0 0 80px rgba(201,168,76,0.3);
+    opacity: 0;
+    animation: slide-up 1.2s ease 1s forwards;
+  }
+  .intro-title em {
+    font-style: italic;
+    color: var(--gold);
+    display: block;
+  }
+  .intro-vol {
+    font-family: 'Raleway', sans-serif;
+    font-weight: 300;
+    font-size: clamp(0.7rem, 1.5vw, 1rem);
+    letter-spacing: 0.3em;
+    color: rgba(245,240,232,0.5);
+    margin-top: 1rem;
+    opacity: 0;
+    animation: slide-up 1s ease 1.4s forwards;
+  }
+  .intro-author {
+    font-family: 'Lora', serif;
+    font-style: italic;
+    font-size: clamp(0.8rem, 1.8vw, 1.1rem);
+    color: rgba(201,168,76,0.7);
+    margin-top: 0.8rem;
+    opacity: 0;
+    animation: slide-up 1s ease 1.6s forwards;
+  }
+
+  @keyframes slide-up {
+    from { opacity: 0; transform: translateY(25px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .open-book-btn {
+    margin-top: 3rem;
+    padding: 1rem 2.5rem;
+    background: transparent;
+    border: 1px solid var(--gold);
+    color: var(--gold);
+    font-family: 'Raleway', sans-serif;
+    font-weight: 300;
+    font-size: 0.75rem;
+    letter-spacing: 0.4em;
+    text-transform: uppercase;
+    cursor: none;
+    transition: all 0.4s ease;
+    position: relative;
+    overflow: hidden;
+    opacity: 0;
+    animation: slide-up 1s ease 2s forwards;
+  }
+  .open-book-btn::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: var(--gold);
+    transform: translateX(-100%);
+    transition: transform 0.4s ease;
+  }
+  .open-book-btn:hover::before { transform: translateX(0); }
+  .open-book-btn:hover { color: var(--ink); }
+  .open-book-btn span { position: relative; z-index: 1; }
+
+  /* ===== BOOK OPENING ANIMATION ===== */
+  #book-open {
+    position: fixed;
+    inset: 0;
+    z-index: 900;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--ink);
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.5s;
+  }
+  #book-open.active {
+    opacity: 1;
+    pointer-events: all;
+  }
+
+  .book-3d {
+    width: min(70vw, 420px);
+    height: min(55vw, 340px);
+    position: relative;
+    perspective: 1500px;
+    transform-style: preserve-3d;
+  }
+
+  .book-cover {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(135deg, #1a1208 0%, #2d1f0a 50%, #1a1208 100%);
+    border: 1px solid var(--gold);
+    border-radius: 3px 10px 10px 3px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 2rem;
+    text-align: center;
+    box-shadow: -8px 0 20px rgba(0,0,0,0.8), inset 0 0 40px rgba(201,168,76,0.05);
+    transform-origin: left center;
+    animation: book-open-anim 2.5s cubic-bezier(0.4,0,0.2,1) forwards;
+    animation-play-state: paused;
+  }
+  .book-cover.opening { animation-play-state: running; }
+
+  @keyframes book-open-anim {
+    0% { transform: rotateY(0deg); }
+    40% { transform: rotateY(-60deg); }
+    70% { transform: rotateY(-120deg); }
+    100% { transform: rotateY(-170deg); box-shadow: none; }
+  }
+
+  .book-spine {
+    position: absolute;
+    left: -12px; top: 0; bottom: 0;
+    width: 12px;
+    background: linear-gradient(to right, #0d0b06, #2d1f0a, #1a1208);
+    border-radius: 2px 0 0 2px;
+    border: 1px solid rgba(201,168,76,0.3);
+    border-right: none;
+  }
+
+  .book-page-bg {
+    position: absolute;
+    inset: 0;
+    background: var(--paper);
+    border-radius: 3px 10px 10px 3px;
+    z-index: -1;
+  }
+
+  .cover-ornament {
+    font-size: 2rem;
+    color: var(--gold);
+    margin-bottom: 0.5rem;
+    opacity: 0.7;
+  }
+  .cover-title-small {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(1rem, 3vw, 1.8rem);
+    font-weight: 900;
+    color: var(--gold-light);
+    line-height: 1.1;
+  }
+  .cover-title-small em { display: block; font-style: italic; font-size: 0.75em; color: var(--gold); }
+  .cover-subtitle { font-family: 'Raleway', sans-serif; font-weight: 200; letter-spacing: 0.3em; font-size: 0.5rem; color: rgba(201,168,76,0.6); margin-top: 0.5rem; text-transform: uppercase; }
+
+  /* ===== MAIN SITE ===== */
+  #main-site {
+    opacity: 0;
+    transition: opacity 1s ease;
+    min-height: 100vh;
+  }
+  #main-site.visible { opacity: 1; }
+
+  /* ===== HERO ===== */
+  #hero {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    overflow: hidden;
+    background: radial-gradient(ellipse at 30% 50%, #1a0f05 0%, var(--ink) 70%);
+  }
+
+  .hero-bg-lines {
+    position: absolute;
+    inset: 0;
+    background-image: repeating-linear-gradient(0deg, transparent, transparent 80px, rgba(201,168,76,0.03) 80px, rgba(201,168,76,0.03) 81px);
+    pointer-events: none;
+  }
+
+  .hero-glow {
+    position: absolute;
+    width: 600px; height: 600px;
+    background: radial-gradient(circle, rgba(201,168,76,0.08) 0%, transparent 70%);
+    border-radius: 50%;
+    top: 50%; left: 30%;
+    transform: translate(-50%, -50%);
+    animation: pulse-glow 4s ease-in-out infinite;
+  }
+  @keyframes pulse-glow {
+    0%, 100% { transform: translate(-50%,-50%) scale(1); opacity: 1; }
+    50% { transform: translate(-50%,-50%) scale(1.15); opacity: 0.6; }
+  }
+
+  .hero-content {
+    position: relative;
+    z-index: 2;
+    max-width: 900px;
+    padding: 2rem;
+    text-align: center;
+  }
+
+  .hero-eyebrow {
+    font-family: 'Raleway', sans-serif;
+    font-weight: 200;
+    letter-spacing: 0.6em;
+    font-size: clamp(0.55rem, 1.2vw, 0.8rem);
+    text-transform: uppercase;
+    color: var(--gold);
+    margin-bottom: 2rem;
+  }
+
+  .hero-title {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(3.5rem, 12vw, 9rem);
+    font-weight: 900;
+    line-height: 0.88;
+    letter-spacing: -0.03em;
+    color: var(--paper);
+  }
+  .hero-title .italic-line {
+    font-style: italic;
+    color: var(--gold);
+    display: block;
+  }
+  .hero-title .small-line {
+    font-size: 0.45em;
+    font-weight: 400;
+    font-style: normal;
+    letter-spacing: 0.05em;
+    color: rgba(245,240,232,0.6);
+    display: block;
+    margin-top: 0.5rem;
+  }
+
+  .hero-quote {
+    font-family: 'Lora', serif;
+    font-style: italic;
+    font-size: clamp(0.9rem, 2vw, 1.2rem);
+    color: rgba(245,240,232,0.5);
+    margin-top: 2.5rem;
+    line-height: 1.8;
+  }
+  .hero-quote strong { color: var(--gold); font-style: normal; font-weight: 500; }
+
+  .hero-nav {
+    display: flex;
+    gap: 1rem;
+    justify-content: center;
+    margin-top: 3rem;
+    flex-wrap: wrap;
+  }
+  .btn-primary {
+    padding: 0.9rem 2.2rem;
+    background: var(--gold);
+    color: var(--ink);
+    font-family: 'Raleway', sans-serif;
+    font-weight: 400;
+    font-size: 0.7rem;
+    letter-spacing: 0.3em;
+    text-transform: uppercase;
+    border: none;
+    cursor: none;
+    transition: all 0.3s ease;
+  }
+  .btn-primary:hover { background: var(--gold-light); transform: translateY(-2px); }
+  .btn-ghost {
+    padding: 0.9rem 2.2rem;
+    background: transparent;
+    color: var(--paper);
+    font-family: 'Raleway', sans-serif;
+    font-weight: 300;
+    font-size: 0.7rem;
+    letter-spacing: 0.3em;
+    text-transform: uppercase;
+    border: 1px solid rgba(245,240,232,0.3);
+    cursor: none;
+    transition: all 0.3s ease;
+  }
+  .btn-ghost:hover { border-color: var(--gold); color: var(--gold); transform: translateY(-2px); }
+
+  .scroll-indicator {
+    position: absolute;
+    bottom: 2rem;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.5rem;
+    color: rgba(245,240,232,0.3);
+    font-family: 'Raleway', sans-serif;
+    font-weight: 200;
+    font-size: 0.6rem;
+    letter-spacing: 0.4em;
+    text-transform: uppercase;
+    animation: bounce 2s ease-in-out infinite;
+  }
+  .scroll-indicator::after {
+    content: '';
+    width: 1px;
+    height: 50px;
+    background: linear-gradient(to bottom, var(--gold), transparent);
+  }
+  @keyframes bounce {
+    0%, 100% { transform: translateX(-50%) translateY(0); }
+    50% { transform: translateX(-50%) translateY(8px); }
+  }
+
+  /* ===== CHARACTERS SECTION ===== */
+  #characters {
+    padding: 8rem 2rem;
+    background: var(--ink);
+    position: relative;
+    overflow: hidden;
+  }
+  .section-label {
+    font-family: 'Raleway', sans-serif;
+    font-weight: 200;
+    letter-spacing: 0.6em;
+    font-size: 0.65rem;
+    text-transform: uppercase;
+    color: var(--gold);
+    text-align: center;
+    margin-bottom: 1rem;
+  }
+  .section-title {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(2rem, 6vw, 4.5rem);
+    font-weight: 700;
+    text-align: center;
+    color: var(--paper);
+    margin-bottom: 5rem;
+    line-height: 1;
+  }
+  .section-title em { font-style: italic; color: var(--gold); }
+
+  .characters-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 2px;
+    max-width: 1200px;
+    margin: 0 auto;
+  }
+
+  .char-card {
+    position: relative;
+    padding: 3rem 2.5rem;
+    background: #0f0d0a;
+    border: 1px solid rgba(201,168,76,0.1);
+    transition: all 0.4s ease;
+    overflow: hidden;
+    cursor: none;
+  }
+  .char-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 3px;
+    background: var(--gold);
+    transform: scaleX(0);
+    transition: transform 0.4s ease;
+    transform-origin: left;
+  }
+  .char-card:hover { background: #1a1508; border-color: rgba(201,168,76,0.3); }
+  .char-card:hover::before { transform: scaleX(1); }
+
+  .char-initial {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 5rem;
+    color: rgba(201,168,76,0.08);
+    position: absolute;
+    top: 1rem; right: 1.5rem;
+    line-height: 1;
+    transition: color 0.4s;
+  }
+  .char-card:hover .char-initial { color: rgba(201,168,76,0.15); }
+
+  .char-name {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.8rem;
+    font-weight: 700;
+    color: var(--gold-light);
+    margin-bottom: 1.5rem;
+    position: relative;
+  }
+  .char-trait {
+    font-family: 'Raleway', sans-serif;
+    font-weight: 200;
+    font-size: 0.6rem;
+    letter-spacing: 0.4em;
+    text-transform: uppercase;
+    color: var(--gold);
+    opacity: 0.7;
+    display: block;
+    margin-top: -1rem;
+    margin-bottom: 1rem;
+  }
+  .char-desc {
+    font-family: 'Lora', serif;
+    font-size: 0.9rem;
+    line-height: 1.8;
+    color: rgba(245,240,232,0.6);
+    font-style: italic;
+  }
+
+  /* ===== CHAPTERS SECTION ===== */
+  #chapters {
+    padding: 8rem 2rem;
+    background: #080604;
+    position: relative;
+  }
+
+  #chapters::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 1px;
+    background: linear-gradient(to right, transparent, var(--gold), transparent);
+  }
+
+  .chapters-layout {
+    display: grid;
+    grid-template-columns: 280px 1fr;
+    gap: 0;
+    max-width: 1100px;
+    margin: 0 auto;
+    border: 1px solid rgba(201,168,76,0.15);
+  }
+
+  .chapters-nav {
+    background: #0a0805;
+    border-right: 1px solid rgba(201,168,76,0.15);
+    padding: 2rem 0;
+  }
+  .chapters-nav-title {
+    font-family: 'Raleway', sans-serif;
+    font-weight: 200;
+    letter-spacing: 0.4em;
+    font-size: 0.55rem;
+    text-transform: uppercase;
+    color: var(--gold);
+    padding: 0 1.5rem 1.5rem;
+    border-bottom: 1px solid rgba(201,168,76,0.1);
+    margin-bottom: 1rem;
+  }
+  .chapter-nav-item {
+    padding: 1rem 1.5rem;
+    cursor: none;
+    transition: all 0.3s ease;
+    border-left: 2px solid transparent;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+  }
+  .chapter-nav-item:hover, .chapter-nav-item.active {
+    background: rgba(201,168,76,0.05);
+    border-left-color: var(--gold);
+  }
+  .chapter-nav-item.active .chap-num { color: var(--gold); }
+  .chap-num {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 1.4rem;
+    color: rgba(201,168,76,0.3);
+    min-width: 28px;
+    transition: color 0.3s;
+  }
+  .chap-title-nav {
+    font-family: 'Lora', serif;
+    font-size: 0.78rem;
+    color: rgba(245,240,232,0.5);
+    line-height: 1.4;
+    transition: color 0.3s;
+  }
+  .chapter-nav-item:hover .chap-title-nav, .chapter-nav-item.active .chap-title-nav { color: var(--paper); }
+
+  .chapter-reader {
+    background: var(--paper);
+    color: var(--ink);
+    min-height: 600px;
+    position: relative;
+  }
+
+  .chapter-header {
+    padding: 3rem 3rem 2rem;
+    border-bottom: 1px solid rgba(0,0,0,0.1);
+    background: var(--paper-dark);
+  }
+  .chapter-num-display {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 1rem;
+    letter-spacing: 0.3em;
+    color: var(--gold);
+    margin-bottom: 0.5rem;
+  }
+  .chapter-title-display {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(1.4rem, 3vw, 2.2rem);
+    font-weight: 700;
+    color: var(--ink);
+    line-height: 1.2;
+  }
+
+  .chapter-text {
+    padding: 3rem;
+    font-family: 'Lora', serif;
+    font-size: clamp(0.9rem, 1.5vw, 1.05rem);
+    line-height: 1.95;
+    color: #1a1512;
+    display: none;
+  }
+  .chapter-text.active { display: block; }
+
+  .chapter-text p {
+    margin-bottom: 1.4em;
+  }
+
+  .dialogue {
+    margin: 1.5em 0 1.5em 1.5em;
+    padding-left: 1rem;
+    border-left: 2px solid var(--gold);
+  }
+  .speaker {
+    font-family: 'Playfair Display', serif;
+    font-weight: 700;
+    font-size: 0.75em;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--red);
+    margin-bottom: 0.2em;
+    display: block;
+  }
+  .speech {
+    font-style: italic;
+    color: #2d2520;
+  }
+
+  .chapter-footer {
+    padding: 2rem 3rem;
+    border-top: 1px solid rgba(0,0,0,0.08);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: var(--paper-dark);
+  }
+  .nav-ch-btn {
+    padding: 0.7rem 1.5rem;
+    background: transparent;
+    border: 1px solid rgba(0,0,0,0.2);
+    font-family: 'Raleway', sans-serif;
+    font-size: 0.65rem;
+    letter-spacing: 0.3em;
+    text-transform: uppercase;
+    cursor: none;
+    transition: all 0.3s;
+    color: var(--ink);
+  }
+  .nav-ch-btn:hover { background: var(--ink); color: var(--gold); border-color: var(--ink); }
+  .nav-ch-btn:disabled { opacity: 0.3; cursor: default; }
+
+  .progress-bar {
+    position: absolute;
+    bottom: 0; left: 0;
+    height: 3px;
+    background: var(--gold);
+    transition: width 0.5s ease;
+  }
+
+  /* ===== QUOTES SECTION ===== */
+  #quotes {
+    padding: 10rem 2rem;
+    background: var(--ink);
+    position: relative;
+    overflow: hidden;
+  }
+
+  .quotes-ticker {
+    display: flex;
+    gap: 6rem;
+    white-space: nowrap;
+    animation: ticker 35s linear infinite;
+  }
+  @keyframes ticker {
+    from { transform: translateX(0); }
+    to { transform: translateX(-50%); }
+  }
+  .ticker-quote {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(1.2rem, 3vw, 2rem);
+    font-style: italic;
+    color: rgba(201,168,76,0.25);
+    flex-shrink: 0;
+    transition: color 0.3s;
+  }
+  .ticker-sep { color: rgba(201,168,76,0.1); }
+
+  .featured-quote {
+    max-width: 700px;
+    margin: 5rem auto 0;
+    text-align: center;
+  }
+  .quote-mark {
+    font-family: 'Playfair Display', serif;
+    font-size: 6rem;
+    color: rgba(201,168,76,0.15);
+    line-height: 0.5;
+    display: block;
+    margin-bottom: 1rem;
+  }
+  .quote-text {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(1.3rem, 3vw, 2rem);
+    font-style: italic;
+    color: var(--paper);
+    line-height: 1.5;
+  }
+  .quote-attr {
+    font-family: 'Raleway', sans-serif;
+    font-weight: 300;
+    font-size: 0.65rem;
+    letter-spacing: 0.4em;
+    color: var(--gold);
+    text-transform: uppercase;
+    margin-top: 1.5rem;
+  }
+
+  /* ===== FOOTER ===== */
+  footer {
+    padding: 4rem 2rem;
+    background: #040302;
+    border-top: 1px solid rgba(201,168,76,0.1);
+    text-align: center;
+  }
+  .footer-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--gold);
+    margin-bottom: 0.5rem;
+  }
+  .footer-author {
+    font-family: 'Lora', serif;
+    font-style: italic;
+    color: rgba(245,240,232,0.4);
+    font-size: 0.9rem;
+    margin-bottom: 2rem;
+  }
+  .footer-link {
+    font-family: 'Raleway', sans-serif;
+    font-weight: 300;
+    font-size: 0.65rem;
+    letter-spacing: 0.3em;
+    text-transform: uppercase;
+    color: var(--gold);
+    text-decoration: none;
+    opacity: 0.6;
+    transition: opacity 0.3s;
+  }
+  .footer-link:hover { opacity: 1; }
+  .footer-copy {
+    font-family: 'Raleway', sans-serif;
+    font-size: 0.6rem;
+    color: rgba(245,240,232,0.2);
+    margin-top: 2rem;
+    letter-spacing: 0.2em;
+  }
+
+  /* Decorative divider */
+  .ornament {
+    text-align: center;
+    color: var(--gold);
+    font-size: 1rem;
+    opacity: 0.3;
+    margin: 1rem 0;
+  }
+
+  @media (max-width: 768px) {
+    .chapters-layout { grid-template-columns: 1fr; }
+    .chapters-nav { border-right: none; border-bottom: 1px solid rgba(201,168,76,0.15); }
+    .chapter-text { padding: 1.5rem; }
+    .chapter-header { padding: 2rem 1.5rem 1.5rem; }
+    .chapter-footer { padding: 1.5rem; flex-direction: column; gap: 1rem; }
+    .dialogue { margin-left: 0; }
+    body { cursor: auto; }
+    .cursor, .cursor-trail { display: none; }
+  }
+</style>
+</head>
+<body>
+
+<!-- Custom cursor -->
+<div class="cursor" id="cursor"></div>
+<div class="cursor-trail" id="cursorTrail"></div>
+
+<!-- ===== CINEMATIC INTRO ===== -->
+<div id="intro">
+  <div class="film-grain"></div>
+  <div class="bar-top"></div>
+  <div class="bar-bottom"></div>
+  <div class="dust" id="dust"></div>
+
+  <div class="intro-content">
+    <div class="intro-tagline">A Story Where Silence Speaks Loudest</div>
+    <h1 class="intro-title">
+      Silence Is
+      <em>Powerful</em>
+    </h1>
+    <div class="intro-vol">Volume One</div>
+    <div class="intro-author">by Ferry_Caddy</div>
+    <button class="open-book-btn" id="openBtn"><span>Open The Book</span></button>
+  </div>
+</div>
+
+<!-- ===== BOOK OPENING ===== -->
+<div id="book-open">
+  <div class="book-3d">
+    <div class="book-page-bg"></div>
+    <div class="book-spine"></div>
+    <div class="book-cover" id="bookCover">
+      <div class="cover-ornament">✦</div>
+      <div class="cover-title-small">
+        Silence Is
+        <em>Powerful</em>
+      </div>
+      <div class="cover-subtitle">Volume I · Ferry_Caddy</div>
+    </div>
+  </div>
+</div>
+
+<!-- ===== MAIN SITE ===== -->
+<div id="main-site">
+
+  <!-- HERO -->
+  <section id="hero">
+    <div class="hero-bg-lines"></div>
+    <div class="hero-glow"></div>
+    <div class="hero-content">
+      <div class="hero-eyebrow">Ferry_Caddy · Volume One</div>
+      <h1 class="hero-title">
+        Silence Is
+        <span class="italic-line">Powerful</span>
+        <span class="small-line">A Story of Observation, Rivalry & Hidden Power</span>
+      </h1>
+      <p class="hero-quote">
+        "Fear spreads faster than facts."<br>
+        — <strong>Frankie's Notebook</strong>
+      </p>
+      <div class="hero-nav">
+        <button class="btn-primary" onclick="document.getElementById('chapters').scrollIntoView({behavior:'smooth'})">
+          Read Now
+        </button>
+        <button class="btn-ghost" onclick="document.getElementById('characters').scrollIntoView({behavior:'smooth'})">
+          Meet the Cast
+        </button>
+      </div>
+    </div>
+    <div class="scroll-indicator">Scroll</div>
+  </section>
+
+  <!-- CHARACTERS -->
+  <section id="characters">
+    <div class="section-label">The Cast</div>
+    <h2 class="section-title">Meet the <em>Characters</em></h2>
+    <div class="characters-grid">
+      <div class="char-card">
+        <div class="char-initial">F</div>
+        <div class="char-name">Frankie</div>
+        <span class="char-trait">The Observer</span>
+        <p class="char-desc">He sits at the window, always scribbling. He never raises his hand first, but when he does — everyone listens. His smile is rare, and when it appears, it feels like being let in on a secret you'll never fully understand.</p>
+      </div>
+      <div class="char-card">
+        <div class="char-initial">S</div>
+        <div class="char-name">Salsa</div>
+        <span class="char-trait">The Conductor</span>
+        <p class="char-desc">Always in motion, always talking. His laugh echoes in corners no one knew existed. His friends follow him instinctively — and his enemies never realize they are one until it's too late.</p>
+      </div>
+      <div class="char-card">
+        <div class="char-initial">V</div>
+        <div class="char-name">Victor</div>
+        <span class="char-trait">The Uncertain</span>
+        <p class="char-desc">Quiet, nervous, always adjusting his bag strap. He studies expressions more than textbooks, yet somehow misses the obvious. A tension surrounds him — always balancing between invisible and unforgettable.</p>
+      </div>
+      <div class="char-card">
+        <div class="char-initial">H</div>
+        <div class="char-name">Huity</div>
+        <span class="char-trait">The Spark</span>
+        <p class="char-desc">He laughs first, even when the joke isn't funny. He moves like he owns the playground. People don't know whether to take him seriously — or whether he's laughing at them. A restlessness burns just under the surface.</p>
+      </div>
+      <div class="char-card" style="grid-column: span 1;">
+        <div class="char-initial">E</div>
+        <div class="char-name">Esita</div>
+        <span class="char-trait">The Silent Force</span>
+        <p class="char-desc">She says very little. Her eyes notice what others miss, and she remembers everything — every whisper, every glance. When she finally speaks, it's like the classroom stops breathing. Her silence is both shield and weapon.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- QUOTES TICKER -->
+  <section id="quotes">
+    <div style="overflow: hidden; width: 100%; margin-bottom: 0;">
+      <div class="quotes-ticker" id="ticker">
+        <span class="ticker-quote">"Confidence is fragile. Silence exposes it."</span>
+        <span class="ticker-sep">✦</span>
+        <span class="ticker-quote">"Observation is greater than reaction."</span>
+        <span class="ticker-sep">✦</span>
+        <span class="ticker-quote">"Loudness is fragile. Discipline is quiet."</span>
+        <span class="ticker-sep">✦</span>
+        <span class="ticker-quote">"Confidence without clarity is a ticking bomb."</span>
+        <span class="ticker-sep">✦</span>
+        <span class="ticker-quote">"The loudest voice carries the least truth."</span>
+        <span class="ticker-sep">✦</span>
+        <span class="ticker-quote">"Panic happens before knowledge does."</span>
+        <span class="ticker-sep">✦</span>
+        <span class="ticker-quote">"Confidence is fragile. Silence exposes it."</span>
+        <span class="ticker-sep">✦</span>
+        <span class="ticker-quote">"Observation is greater than reaction."</span>
+        <span class="ticker-sep">✦</span>
+        <span class="ticker-quote">"Loudness is fragile. Discipline is quiet."</span>
+        <span class="ticker-sep">✦</span>
+        <span class="ticker-quote">"Confidence without clarity is a ticking bomb."</span>
+        <span class="ticker-sep">✦</span>
+        <span class="ticker-quote">"The loudest voice carries the least truth."</span>
+        <span class="ticker-sep">✦</span>
+        <span class="ticker-quote">"Panic happens before knowledge does."</span>
+        <span class="ticker-sep">✦</span>
+      </div>
+    </div>
+
+    <div class="featured-quote">
+      <span class="quote-mark">"</span>
+      <p class="quote-text" id="featuredQuoteText">Confidence and fear are louder than knowledge.</p>
+      <div class="quote-attr" id="featuredQuoteAttr">— Frankie's Notebook, Chapter 1</div>
+    </div>
+  </section>
+
+  <!-- CHAPTERS -->
+  <section id="chapters">
+    <div class="section-label">The Story</div>
+    <h2 class="section-title">Read the <em>Book</em></h2>
+
+    <div class="chapters-layout">
+      <!-- Nav sidebar -->
+      <div class="chapters-nav">
+        <div class="chapters-nav-title">Table of Contents</div>
+        <div class="chapter-nav-item active" data-ch="0" onclick="showChapter(0)">
+          <span class="chap-num">✦</span>
+          <span class="chap-title-nav">Character Profiles</span>
+        </div>
+        <div class="chapter-nav-item" data-ch="1" onclick="showChapter(1)">
+          <span class="chap-num">01</span>
+          <span class="chap-title-nav">The Whisper Before The Bell</span>
+        </div>
+        <div class="chapter-nav-item" data-ch="2" onclick="showChapter(2)">
+          <span class="chap-num">02</span>
+          <span class="chap-title-nav">The Group Reading Chaos</span>
+        </div>
+        <div class="chapter-nav-item" data-ch="3" onclick="showChapter(3)">
+          <span class="chap-num">03</span>
+          <span class="chap-title-nav">Sports Day Chaos</span>
+        </div>
+        <div class="chapter-nav-item" data-ch="4" onclick="showChapter(4)">
+          <span class="chap-num">04</span>
+          <span class="chap-title-nav">Sparks, Chaos and the Fight</span>
+        </div>
+        <div class="chapter-nav-item" data-ch="5" onclick="showChapter(5)">
+          <span class="chap-num">05</span>
+          <span class="chap-title-nav">Results Day & Quiet Shift</span>
+        </div>
+        <div class="chapter-nav-item" data-ch="6" onclick="showChapter(6)">
+          <span class="chap-num">06</span>
+          <span class="chap-title-nav">After The Bell — Actual Shift</span>
+        </div>
+      </div>
+
+      <!-- Reader -->
+      <div class="chapter-reader">
+        <div class="progress-bar" id="progressBar" style="width:0%"></div>
+
+        <!-- Chapter 0: Profiles -->
+        <div class="chapter-header" id="ch-header-0">
+          <div class="chapter-num-display">Prologue</div>
+          <div class="chapter-title-display">Character Profiles</div>
+        </div>
+        <div class="chapter-text active" id="ch-0">
+          <div class="dialogue"><span class="speaker">Frankie</span><p class="speech">He sits at the window, always scribbling something in his notebook, but nobody knows if it's homework, sketches, or secrets. He never raises his hand first, but when he does, everyone listens. Some say he's just lucky; others say he sees things they can't. He smiles rarely, but when he does, it feels like he's letting the world in on something they'll never fully understand.</p></div>
+          <div class="dialogue"><span class="speaker">Salsa</span><p class="speech">Always in motion, always talking. His laugh is loud enough to echo in corners of the classroom nobody even knew existed. He has a way of making people believe he's always right, even when he clearly isn't. His friends follow him instinctively, and his enemies... well, they usually don't notice they are one until it's too late.</p></div>
+          <div class="dialogue"><span class="speaker">Victor</span><p class="speech">Quiet, nervous, always adjusting his bag strap or tapping his pen. He studies expressions more than textbooks, yet somehow misses the obvious. People often wonder if he's shy—or if he's watching everything, waiting for the right moment to act. There's a tension about him, like he's always balancing between being invisible and being unforgettable.</p></div>
+          <div class="dialogue"><span class="speaker">Huity</span><p class="speech">He laughs first, even when the joke isn't funny. He moves like he owns the playground, runs like the wind, but slips up in moments people would never expect. People don't know whether to take him seriously—or whether he's laughing at them. There's a restlessness in him, a spark of trouble just under the surface.</p></div>
+          <div class="dialogue"><span class="speaker">Esita</span><p class="speech">She says very little. Her eyes notice what the others miss, and she remembers everything—every whisper, every glance. When she finally speaks, it's like the classroom stops breathing. Her silence is a shield and a weapon, and no one knows what she's thinking... until she wants them to.</p></div>
+        </div>
+
+        <!-- Chapter 1 -->
+        <div class="chapter-header" id="ch-header-1" style="display:none">
+          <div class="chapter-num-display">Chapter One</div>
+          <div class="chapter-title-display">The Whisper Before The Bell</div>
+        </div>
+        <div class="chapter-text" id="ch-1">
+          <p>The classroom smelled of chalk dust and quiet anxiety, the kind that clung to skin and pencils alike. Sunlight spilled through tall windows, catching dust particles that danced like tiny spectators. Frankie sat by the window, notebook open, pen poised—not to doodle, but to observe. Every twitch, every glance, every suppressed sigh mattered. Patterns existed everywhere. He intended to find them.</p>
+          <p>The door slammed open. Salsa stormed in, energy bursting like a firecracker, making the silence seem criminal.</p>
+          <div class="dialogue"><span class="speaker">Salsa</span><p class="speech">"Yo! Today is it! Mr. Ade's exam is next. Only geniuses survive this one."</p></div>
+          <p>Victor froze, pen wobbling as if it had suddenly grown nervous.</p>
+          <div class="dialogue"><span class="speaker">Victor</span><p class="speech">"Only... geniuses?"</p></div>
+          <p>Huity leaned back, kicking his leg under the desk with exaggerated flair.</p>
+          <div class="dialogue"><span class="speaker">Huity</span><p class="speech">"Ahh... so if I fail, I should start drafting my résumé for street football?"</p></div>
+          <p>Some kids snickered, others tried to hide it. Salsa's grin widened—control was his game, and he played it effortlessly.</p>
+          <p>Frankie scribbled silently: <em>Fear spreads faster than facts.</em></p>
+          <p>Salsa prowled the aisles under the guise of "helping," tapping desks to measure reactions.</p>
+          <div class="dialogue"><span class="speaker">Salsa</span><p class="speech">"Victor, you're shaking. Don't tell me you didn't study!"</p></div>
+          <p>Victor stammered, clutching at excuses.</p>
+          <div class="dialogue"><span class="speaker">Victor</span><p class="speech">"No, I... I just... pen is slippery?"</p></div>
+          <p>Huity's laugh exploded, sharp and sudden.</p>
+          <div class="dialogue"><span class="speaker">Huity</span><p class="speech">"Slippery pen? Bro, even my grandma's pen is steadier than you!"</p></div>
+          <p>Victor's face flushed crimson. Frankie's eyes noted every twitch. In her corner, Esita watched silently, calculating, her gaze precise. Finally, she spoke, her words slicing through the tension.</p>
+          <div class="dialogue"><span class="speaker">Esita</span><p class="speech">"Or maybe the pen just knows who's panicking."</p></div>
+          <p>The room froze. Salsa's grin wavered. Huity paused mid-laugh. Victor nearly dropped his pen. Frankie smirked faintly, unseen, a quiet witness to the chaos.</p>
+          <p>The bell rang. Pens rolled, chairs scraped, but the tension lingered like smoke.</p>
+          <p>During the exam, the subtle dance continued. Salsa whispered hints—sometimes helpful, sometimes misleading—testing both students and himself. Victor copied glances from his neighbors, panic flaring when answers didn't match. Huity scribbled nonsense, laughing at moments designed to unsettle.</p>
+          <p>Huity leaned toward Frankie at one point.</p>
+          <div class="dialogue"><span class="speaker">Huity</span><p class="speech">"Psst... if I fail, save my spot on the football team. Street-level victory awaits."</p></div>
+          <p>Frankie didn't smile.</p>
+          <div class="dialogue"><span class="speaker">Frankie</span><p class="speech">"You'll need more than jokes to pass Mr. Ade."</p></div>
+          <p>Huity shrugged, returning to a doodle of a stick figure with a suspicious resemblance to Salsa. Esita leaned forward, deliberate, her pen tapping in quiet rhythm.</p>
+          <div class="dialogue"><span class="speaker">Esita</span><p class="speech">"Watch them. Panic happens before knowledge does."</p></div>
+          <p>Frankie wrote one last note: <em>Confidence and fear are louder than knowledge.</em></p>
+          <p>When the exam ended, Salsa walked out triumphant. Victor looked drained, as if his mind had run a marathon. Huity seemed unconcerned, though beads of sweat betrayed him. And Esita... Esita packed her bag calmly, composed, as if she had already won a war no one else noticed.</p>
+          <p>Frankie leaned back, eyes scanning the emptying room. The real game hadn't started yet—it had only just begun.</p>
+        </div>
+
+        <!-- Chapter 2 -->
+        <div class="chapter-header" id="ch-header-2" style="display:none">
+          <div class="chapter-num-display">Chapter Two</div>
+          <div class="chapter-title-display">The Group Reading Chaos</div>
+        </div>
+        <div class="chapter-text" id="ch-2">
+          <p>The classroom smelled faintly of marker and anxiety, a mixture that clung to the air and made pencils sweat.</p>
+          <p>Frankie sat near the back, arms crossed, notebook open—but mostly for appearances. He wasn't taking notes. He was watching. Always watching.</p>
+          <p>The silence shattered as Salsa slammed his notebook shut, the sound echoing like a drumbeat.</p>
+          <div class="dialogue"><span class="speaker">Salsa</span><p class="speech">"Alright, team! Group reading. I'll explain, because clearly I'm the only one smart enough for this topic."</p></div>
+          <p>Victor fidgeted, eyes darting nervously.</p>
+          <div class="dialogue"><span class="speaker">Victor</span><p class="speech">"Uh... you sure we all need explaining? I read some last night..."</p></div>
+          <div class="dialogue"><span class="speaker">Salsa</span><p class="speech">"Victor, my guy... we're talking team effort. You can't just sit there thinking you're some lone genius."</p></div>
+          <p>Huity rolled his eyes so hard it was audible.</p>
+          <div class="dialogue"><span class="speaker">Huity</span><p class="speech">"Yeah, Victor, don't make us all look bad. Or worse... boring."</p></div>
+          <div class="dialogue"><span class="speaker">Victor</span><p class="speech"><em>(muttering)</em> "Better boring than humiliated..."</p></div>
+          <p>Frankie raised an eyebrow but said nothing. He already knew how the next few minutes would play out.</p>
+          <p>Salsa began speaking confidently, waving his pen like a conductor's baton.</p>
+          <div class="dialogue"><span class="speaker">Salsa</span><p class="speech">"So, chapter five... very simple. Concept is obvious. But the rest of you might struggle, so listen carefully."</p></div>
+          <div class="dialogue"><span class="speaker">Victor</span><p class="speech"><em>(whispering to Huity)</em> "Obvious for him, maybe..."</p></div>
+          <div class="dialogue"><span class="speaker">Huity</span><p class="speech">"Obvious? Bro, I haven't understood anything since day one. I'm just here for the drama."</p></div>
+          <p>Salsa paused mid-sentence, flicking a glance at Huity, smirk tugging at his lips.</p>
+          <div class="dialogue"><span class="speaker">Salsa</span><p class="speech">"Drama? Oh, we'll get to that... if you survive my explanation."</p></div>
+          <p>Esita, leaning back in her chair with calm precision, finally spoke. Her words cut the tension like a scalpel.</p>
+          <div class="dialogue"><span class="speaker">Esita</span><p class="speech">"Or maybe if he survives your explanation, you'll survive his silence."</p></div>
+          <p>The room froze. Salsa blinked. Huity chuckled nervously. Victor nearly dropped his pencil. Frankie smirked faintly, jotting a quick note: <em>Confidence is fragile. Silence exposes it.</em></p>
+          <p>Salsa cleared his throat, pretending nothing had happened.</p>
+          <div class="dialogue"><span class="speaker">Salsa</span><p class="speech">"Anyway... first question. Anyone?"</p></div>
+          <div class="dialogue"><span class="speaker">Victor</span><p class="speech">"Uh... I think... maybe the answer is... uh..."</p></div>
+          <p>Before he could finish, Huity interrupted.</p>
+          <div class="dialogue"><span class="speaker">Huity</span><p class="speech">"My answer is 42."</p></div>
+          <div class="dialogue"><span class="speaker">Victor</span><p class="speech">"42?? That's the wrong chapter!"</p></div>
+          <div class="dialogue"><span class="speaker">Huity</span><p class="speech">"Well, it's the answer to life, right? Might as well be on the test."</p></div>
+          <p>Salsa groaned, throwing his pen onto his notebook.</p>
+          <div class="dialogue"><span class="speaker">Salsa</span><p class="speech">"Stop joking! Focus!"</p></div>
+          <div class="dialogue"><span class="speaker">Esita</span><p class="speech"><em>(softly, cutting)</em> "Or maybe someone should. Clearly, that's not you."</p></div>
+          <p>The room went silent. Even Huity's laughter had been sucked out of the air.</p>
+          <p>Frankie leaned back, calm, watching Salsa sweat just slightly at the edges.</p>
+          <div class="dialogue"><span class="speaker">Frankie</span><p class="speech"><em>(quietly)</em> "Explain why it's obvious to you. Step by step."</p></div>
+          <p>Salsa faltered. For a single heartbeat, his confident mask slipped. He cleared his throat, words tumbling out awkwardly.</p>
+          <div class="dialogue"><span class="speaker">Salsa</span><p class="speech">"Well... uh... basically... you see..."</p></div>
+          <div class="dialogue"><span class="speaker">Esita</span><p class="speech">"Sometimes the loudest voice carries the least truth."</p></div>
+          <p>Frankie scribbled another note: <em>Observation > reaction.</em></p>
+          <p>By the end of the session, subtle chaos lingered. Salsa's confidence remained—but brittle. Victor's nervousness had transformed into cautious awareness. Huity's humor now carried patterns of genuine interest. Esita... unreadable, calculating. Frankie... calm, precise, always three steps ahead.</p>
+          <p>The bell rang. Huity leaned toward Frankie, whispering.</p>
+          <div class="dialogue"><span class="speaker">Huity</span><p class="speech">"Yo... he's gonna explode tomorrow, isn't he?"</p></div>
+          <div class="dialogue"><span class="speaker">Frankie</span><p class="speech"><em>(calm, knowing)</em> "Depends who panics first."</p></div>
+          <div class="dialogue"><span class="speaker">Esita</span><p class="speech"><em>(softly)</em> "Confidence without clarity is a ticking bomb."</p></div>
+          <p>Frankie smiled faintly—not friendly, not amused. Knowing. The game was just beginning—and no one else realized it yet.</p>
+        </div>
+
+        <!-- Chapter 3 -->
+        <div class="chapter-header" id="ch-header-3" style="display:none">
+          <div class="chapter-num-display">Chapter Three</div>
+          <div class="chapter-title-display">Sports Day Chaos</div>
+        </div>
+        <div class="chapter-text" id="ch-3">
+          <p>The sun was barely up, but the school field already smelled of wet grass, sweat, and nervous energy.</p>
+          <p>Frankie stood at the edge of the field, notebook tucked into his bag—not for notes this time, just to watch patterns. Always patterns.</p>
+          <p>Salsa strutted toward the group like he owned every blade of grass.</p>
+          <div class="dialogue"><span class="speaker">Salsa</span><p class="speech">"Alright, listen up! Captain for football? Obviously, it's me. Talent, looks, vibes... I check all the boxes."</p></div>
+          <div class="dialogue"><span class="speaker">Huity</span><p class="speech">"Vibes? Bro, the only vibe I see is people laughing at your running technique."</p></div>
+          <div class="dialogue"><span class="speaker">Victor</span><p class="speech"><em>(quietly, like testing gravity)</em> "Uh... I thought captain should be the one who trains the most?"</p></div>
+          <div class="dialogue"><span class="speaker">Salsa</span><p class="speech"><em>(dismissively)</em> "Victor, my guy, training is cute. Charisma wins hearts, hearts win games."</p></div>
+          <p>Frankie raised an eyebrow but said nothing. His gaze slid to Huity, already doing push-ups on the sideline, smirking like it was a performance.</p>
+          <div class="dialogue"><span class="speaker">Huity</span><p class="speech"><em>(grinning at Frankie)</em> "Look at them. All loud, all confident, all about to trip on their own egos."</p></div>
+          <div class="dialogue"><span class="speaker">Esita</span><p class="speech">"Or maybe they're just all about to learn that confidence isn't a game."</p></div>
+          <p>Salsa laughed, brushing it off.</p>
+          <div class="dialogue"><span class="speaker">Salsa</span><p class="speech">"See? Even Esita thinks I'm destined for captain. I'm untouchable!"</p></div>
+          <p>Frankie tilted his head. <em>Untouchable? Not yet.</em></p>
+          <p>The teacher, Mr. Ade, held the list of participants.</p>
+          <div class="dialogue"><span class="speaker">Mr. Ade</span><p class="speech">"Pick teams. Frankie, you're with Victor. Salsa, you're... well, good luck."</p></div>
+          <p>Victor gulped. Huity rolled his eyes.</p>
+          <div class="dialogue"><span class="speaker">Huity</span><p class="speech"><em>(whispering to Victor)</em> "Lucky you... I hope you can run faster than your thoughts."</p></div>
+          <p>The whistle blew. Chaos erupted. Balls flew. Shoes slipped. Voices shouted. Salsa ran everywhere, like he was auditioning for a music video. Huity sprinted, laughing, nearly colliding with Victor twice.</p>
+          <p>Victor tripped once. Twice. Each time, Salsa yelled:</p>
+          <div class="dialogue"><span class="speaker">Salsa</span><p class="speech">"Focus! Focus! You're embarrassing the team!"</p></div>
+          <p>Victor wanted to disappear. Frankie moved calmly, positioning, observing—never faster than he needed. When the ball came near him, he acted: smooth, precise, quiet. He passed, intercepted, and scored one goal without a sound of celebration.</p>
+          <div class="dialogue"><span class="speaker">Esita</span><p class="speech"><em>(watching from the edge)</em> "Notice how Frankie doesn't need to shout, yet everyone reacts."</p></div>
+          <div class="dialogue"><span class="speaker">Huity</span><p class="speech"><em>(panting)</em> "Seriously... he's like a ghost with skills. I want that aura, but with jokes."</p></div>
+          <p>Salsa ran past Frankie again, trying to steal the ball. Frankie sidestepped him, grabbed it, and passed straight to Victor, who finally managed a proper kick. The ball went in.</p>
+          <div class="dialogue"><span class="speaker">Victor</span><p class="speech"><em>(shocked)</em> "I... I did it?"</p></div>
+          <div class="dialogue"><span class="speaker">Frankie</span><p class="speech">"Yes. You did. Now don't let nerves ruin the next one."</p></div>
+          <div class="dialogue"><span class="speaker">Salsa</span><p class="speech"><em>(muttering on the sidelines)</em> "I hate that I let a quiet guy make me look like a fool..."</p></div>
+          <div class="dialogue"><span class="speaker">Esita</span><p class="speech">"Loudness is fragile. Discipline is quiet."</p></div>
+          <p>By the end of the match, the chaos had cleared. The scoreboard didn't matter. What mattered: Salsa realized confidence without control is useless. Victor saw he could act under pressure if guided correctly. Huity understood humor can hide fear, but discipline is stronger.</p>
+          <p>And Frankie... he just smiled faintly, a ghost among chaos, already noting everyone's weaknesses and strengths. In that calm, cold smile was a promise:</p>
+          <p><em>The game isn't over. It's just beginning.</em></p>
+        </div>
+
+        <!-- Chapter 4 -->
+        <div class="chapter-header" id="ch-header-4" style="display:none">
+          <div class="chapter-num-display">Chapter Four</div>
+          <div class="chapter-title-display">Sparks, Chaos and the Fight</div>
+        </div>
+        <div class="chapter-text" id="ch-4">
+          <p>The classroom buzzed like a live wire. Sunshine streamed through the windows, but the air was thick with tension, laughter, and whispered dares. Today wasn't just Spin the Bottle—it was Truth or Dare gone wild.</p>
+          <p>Salsa spun the bottle first. It landed on Frankie. The entire class leaned in.</p>
+          <div class="dialogue"><span class="speaker">Salsa</span><p class="speech">"Well... Frankie. Truth or dare?"</p></div>
+          <div class="dialogue"><span class="speaker">Frankie</span><p class="speech"><em>(calm, a sly glint in his eyes)</em> "Dare. Of course."</p></div>
+          <div class="dialogue"><span class="speaker">Salsa</span><p class="speech"><em>(grinning)</em> "I dare... you to kiss Esita. Right now."</p></div>
+          <p>A hush fell. Huity snorted, disbelief written all over his face.</p>
+          <div class="dialogue"><span class="speaker">Huity</span><p class="speech">"Finally! Drama! Someone call Netflix!"</p></div>
+          <p>Esita's eyes didn't flinch. She tilted her head, studying Frankie.</p>
+          <div class="dialogue"><span class="speaker">Esita</span><p class="speech">"If you do it, do it with purpose. Otherwise... don't waste my time."</p></div>
+          <p>Frankie moved forward slowly. Their lips brushed for a brief, electric moment—just long enough for everyone to notice. The room practically exploded in whispers. Salsa's jaw tightened.</p>
+          <div class="dialogue"><span class="speaker">Salsa</span><p class="speech"><em>(gritting his teeth)</em> "Oh... so that's how it's going to be?"</p></div>
+          <p>He lunged forward, grabbing Frankie's shirt.</p>
+          <div class="dialogue"><span class="speaker">Salsa</span><p class="speech">"You think you can just... do that?!"</p></div>
+          <div class="dialogue"><span class="speaker">Frankie</span><p class="speech"><em>(calm, stepping back but holding his ground)</em> "Careful, Salsa. You're about to embarrass yourself."</p></div>
+          <div class="dialogue"><span class="speaker">Huity</span><p class="speech"><em>(half-laughing, half-panicking)</em> "Oi! Chill! This isn't WWE, boys!"</p></div>
+          <div class="dialogue"><span class="speaker">Victor</span><p class="speech"><em>(hiding behind notebook)</em> "I... I knew this day would be chaos..."</p></div>
+          <p>Salsa shoved Frankie. Frankie shoved back. Chairs scraped, voices rose—then Esita stepped forward. Her eyes were cold, steady, dangerous.</p>
+          <div class="dialogue"><span class="speaker">Esita</span><p class="speech"><em>(sharp)</em> "Stop. Now."</p></div>
+          <p>The room froze. Even Salsa and Frankie paused mid-motion.</p>
+          <div class="dialogue"><span class="speaker">Esita</span><p class="speech">"You're both acting like fools. Grow up, or I'll make sure everyone here sees exactly how ridiculous you are."</p></div>
+          <p>Her voice carried authority. Frankie relaxed slightly, Salsa scowled, and Huity exhaled like he'd just survived a storm.</p>
+          <div class="dialogue"><span class="speaker">Esita</span><p class="speech"><em>(turning to the room)</em> "And you—watching and whispering—remember that chaos has consequences. Not everyone survives unscathed."</p></div>
+          <div class="dialogue"><span class="speaker">Frankie</span><p class="speech"><em>(softly, to Esita)</em> "Thanks... for stopping him."</p></div>
+          <div class="dialogue"><span class="speaker">Esita</span><p class="speech"><em>(without breaking eye contact)</em> "Next time... let's see if you both can behave."</p></div>
+          <div class="dialogue"><span class="speaker">Huity</span><p class="speech"><em>(collapsing into chair)</em> "Chaos, sparks, almost fights, and a kiss? Someone... someone pinch me!"</p></div>
+          <div class="dialogue"><span class="speaker">Victor</span><p class="speech"><em>(still hiding)</em> "I... I think I saw my life flash before me."</p></div>
+          <p>By the end of the day, the classroom had become a battlefield of attraction, rivalry, and tension. Esita had quietly asserted control, and everyone knew: Frankie, Salsa, and even the minor students had just survived a taste of her power.</p>
+          <p><em>Sparks had flown. Chaos had erupted. And only one person walked out fully unshaken.</em></p>
+        </div>
+
+        <!-- Chapter 5 -->
+        <div class="chapter-header" id="ch-header-5" style="display:none">
+          <div class="chapter-num-display">Chapter Five</div>
+          <div class="chapter-title-display">Results Day & Quiet Shift</div>
+        </div>
+        <div class="chapter-text" id="ch-5">
+          <p>The classroom smelled of pencils, paper, and nervous energy. Results Day. The kind of day where even a simple breath felt like it weighed a ton.</p>
+          <p>Frankie leaned against the window, calm as ever. His mind drifted for a moment.</p>
+          <p><em>Flashback — Last Month: Huity had accidentally tripped Victor during a football match, sending both rolling into the mud. Frankie had watched silently, noting how Victor's anxiety spiked—but also how he bounced back with a small laugh. Observation always pays off.</em></p>
+          <p>Salsa paced like a caged tiger, overconfident on the surface but panicked underneath.</p>
+          <div class="dialogue"><span class="speaker">Salsa</span><p class="speech"><em>(muttering)</em> "C'mon, it's just results... but what if they're... worse?"</p></div>
+          <div class="dialogue"><span class="speaker">Huity</span><p class="speech">"Worse? Bro, you're sweating like you ran a marathon. Chill. Or I'll call it 'Salsa's Public Meltdown.'"</p></div>
+          <p>Victor sat hunched, glancing nervously at everyone. <em>He remembered Frankie lending him a pencil case last week, no words exchanged—a small kindness that gave him a flicker of courage now.</em></p>
+          <p>The teacher placed the results on the table. Hearts raced. The first few results were read aloud. Huity had barely passed math. Salsa got top marks—but his expression faltered for the briefest moment. Frankie's marks were average, but he didn't react outwardly. He just noted: <em>Patterns matter more than numbers.</em></p>
+          <p>As predicted, Salsa's expression snapped when Esita's marks were announced: top of the class.</p>
+          <div class="dialogue"><span class="speaker">Salsa</span><p class="speech"><em>(muttering)</em> "Of course... why not her?"</p></div>
+          <div class="dialogue"><span class="speaker">Huity</span><p class="speech"><em>(to Victor)</em> "See? Chaos and envy always go together."</p></div>
+          <div class="dialogue"><span class="speaker">Frankie</span><p class="speech"><em>(softly, to himself)</em> "Confidence without arrogance. Always dangerous."</p></div>
+          <p>The room buzzed—then Salsa suddenly shoved a chair out of frustration.</p>
+          <div class="dialogue"><span class="speaker">Salsa</span><p class="speech">"Why does it always go like this?!"</p></div>
+          <div class="dialogue"><span class="speaker">Frankie</span><p class="speech"><em>(stepping forward, cold)</em> "Control yourself, Salsa. Or let the results teach you instead of pride."</p></div>
+          <p>Salsa lunged. Fists raised.</p>
+          <div class="dialogue"><span class="speaker">Esita</span><p class="speech"><em>(sharp, icy)</em> "Stop. Now."</p></div>
+          <div class="dialogue"><span class="speaker">Esita</span><p class="speech">"This is Results Day, not a boxing ring. If you two can't behave, you'll be cleaning every classroom after school—together."</p></div>
+          <p>The threat worked. Salsa lowered his fists, breathing heavily. Frankie smirked faintly.</p>
+          <div class="dialogue"><span class="speaker">Huity</span><p class="speech">"And just like that... boom! Power restored."</p></div>
+          <div class="dialogue"><span class="speaker">Victor</span><p class="speech"><em>(whispering)</em> "Esita... you're scary."</p></div>
+          <div class="dialogue"><span class="speaker">Frankie</span><p class="speech"><em>(glancing at her, smirk in place)</em> "Scary... maybe. Smart... definitely."</p></div>
+          <p>The rest of the day passed in quiet shifts of tension, teasing, and subtle power plays. Today wasn't just about results. It was about hierarchy, observation, and who could survive teenage chaos without losing control.</p>
+        </div>
+
+        <!-- Chapter 6 -->
+        <div class="chapter-header" id="ch-header-6" style="display:none">
+          <div class="chapter-num-display">Chapter Six</div>
+          <div class="chapter-title-display">After The Bell — Actual Shift</div>
+        </div>
+        <div class="chapter-text" id="ch-6">
+          <p>The bell had rung hours ago, but the classroom was far from empty. Chairs were half-pushed back. Papers lay scattered. A strange tension hummed in the air.</p>
+          <p>Salsa leaned against the window, arms crossed, jaw clenched. He scanned the room as if he could sense every fault in the air itself.</p>
+          <div class="dialogue"><span class="speaker">Victor</span><p class="speech">"Why does it feel like... everyone's hiding something?"</p></div>
+          <div class="dialogue"><span class="speaker">Huity</span><p class="speech">"Maybe because they are. Or maybe it's just you."</p></div>
+          <p>Then Amanda entered—familiar to everyone, effortless, teasing, as if she had belonged there from day one. Her gaze found Salsa instantly.</p>
+          <div class="dialogue"><span class="speaker">Salsa</span><p class="speech"><em>(relieved, whispering)</em> "Amanda... finally."</p></div>
+          <div class="dialogue"><span class="speaker">Amanda</span><p class="speech"><em>(smirking)</em> "Thought I'd check on you guys. Seems like chaos is still the main class activity."</p></div>
+          <div class="dialogue"><span class="speaker">Salsa</span><p class="speech"><em>(quietly)</em> "Everyone's acting... weird today. I don't know who to trust."</p></div>
+          <div class="dialogue"><span class="speaker">Amanda</span><p class="speech"><em>(softly, smiling)</em> "Well... you can trust me. Right?"</p></div>
+          <p>Frankie noticed, just a flicker in his eyes. Salsa's loyalty was already shifting.</p>
+          <p>As minor students shuffled in, careless words drifted to the group.</p>
+          <p><em>Minor student, laughing:</em> "Frankie's really controlling Esita, huh? Heard he told her who to hang with."</p>
+          <p>Salsa stiffened. Frankie's calm mask didn't falter.</p>
+          <div class="dialogue"><span class="speaker">Salsa</span><p class="speech"><em>(low, dangerous)</em> "Frankie... did you... tell Esita stuff about me?"</p></div>
+          <div class="dialogue"><span class="speaker">Frankie</span><p class="speech"><em>(cold, calm)</em> "I don't tell anyone anything, Salsa. Relax."</p></div>
+          <div class="dialogue"><span class="speaker">Salsa</span><p class="speech">"Relax? You always say that. But who are you really playing for?"</p></div>
+          <div class="dialogue"><span class="speaker">Victor</span><p class="speech"><em>(gently)</em> "Guys... maybe we should just... talk it out?"</p></div>
+          <p>Amanda stepped closer to Salsa.</p>
+          <div class="dialogue"><span class="speaker">Amanda</span><p class="speech"><em>(teasing, softly)</em> "Don't listen to everyone else. Frankie's not your problem. You know I've got your back."</p></div>
+          <p>Salsa nodded, eyes darting suspiciously. His trust had shifted almost entirely to Amanda, leaving cracks between the rest of the group. The villain's influence was everywhere—minor whispers about loyalty, small jokes twisted into doubts, suspicion seeping through every laugh.</p>
+          <div class="dialogue"><span class="speaker">Salsa</span><p class="speech"><em>(angry, muttering)</em> "I can't... I can't trust any of them anymore. Only you."</p></div>
+          <div class="dialogue"><span class="speaker">Amanda</span><p class="speech"><em>(smiling, encouraging the doubt)</em> "Exactly. Just us."</p></div>
+          <div class="dialogue"><span class="speaker">Frankie</span><p class="speech">"You're making a mistake, Salsa. Dividing the group won't help you—won't help anyone."</p></div>
+          <div class="dialogue"><span class="speaker">Salsa</span><p class="speech"><em>(snapping)</em> "Maybe it will! Maybe some people need to be... reminded of their place."</p></div>
+          <p>Esita's eyes glimmered—unreadable. She didn't speak, but her silence amplified the tension. Minor students whispered, eyes wide, feeling the invisible knife slicing through friendships.</p>
+          <p>By the end of the period, the group was split. Salsa's loyalty clung to Amanda. Frankie, Victor, Huity, and Esita were aware the dynamic had shifted—but no one knew who was pulling the strings.</p>
+          <p><em>The villain's hand was invisible, but the cracks ran deep.</em></p>
+          <div class="ornament" style="margin-top:2rem; font-size:1.5rem;">✦ End of Volume One ✦</div>
+        </div>
+
+        <!-- Chapter footer nav -->
+        <div class="chapter-footer">
+          <button class="nav-ch-btn" id="prevBtn" onclick="changeChapter(-1)" disabled>← Previous</button>
+          <span style="font-family:'Raleway',sans-serif; font-size:0.6rem; letter-spacing:0.3em; color:rgba(0,0,0,0.3); text-transform:uppercase;" id="chapterCounter">Profiles</span>
+          <button class="nav-ch-btn" id="nextBtn" onclick="changeChapter(1)">Next →</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- FOOTER -->
+  <footer>
+    <div class="footer-title">Silence Is Powerful</div>
+    <div class="footer-author">Volume I · by Ferry_Caddy</div>
+    <a class="footer-link" href="https://www.wattpad.com/story/407473121-silence-is-powerful-volume-1" target="_blank">Read on Wattpad ↗</a>
+    <div class="footer-copy">Website built with ♥ for Ferry_Caddy · Freelance Project</div>
+  </footer>
+
+</div><!-- end #main-site -->
+
+<script>
+  // Custom cursor
+  const cursor = document.getElementById('cursor');
+  const trail = document.getElementById('cursorTrail');
+  let mx = 0, my = 0;
+  document.addEventListener('mousemove', e => {
+    mx = e.clientX; my = e.clientY;
+    cursor.style.left = mx - 6 + 'px';
+    cursor.style.top = my - 6 + 'px';
+    setTimeout(() => {
+      trail.style.left = mx - 15 + 'px';
+      trail.style.top = my - 15 + 'px';
+    }, 80);
+  });
+
+  // Dust particles
+  function createDust() {
+    const d = document.getElementById('dust');
+    for (let i = 0; i < 20; i++) {
+      const p = document.createElement('div');
+      p.className = 'dust-particle';
+      p.style.cssText = `
+        left: ${Math.random()*100}%;
+        animation-duration: ${6 + Math.random()*10}s;
+        animation-delay: ${Math.random()*5}s;
+        opacity: ${0.3 + Math.random()*0.7};
+        width: ${1+Math.random()*2}px;
+        height: ${1+Math.random()*2}px;
+      `;
+      d.appendChild(p);
+    }
+  }
+  createDust();
+
+  // Intro → Book open → Main site
+  document.getElementById('openBtn').addEventListener('click', () => {
+    const intro = document.getElementById('intro');
+    const bookOpen = document.getElementById('book-open');
+    const mainSite = document.getElementById('main-site');
+    const cover = document.getElementById('bookCover');
+    const barTop = document.querySelector('.bar-top');
+    const barBottom = document.querySelector('.bar-bottom');
+
+    // Add letterbox bars open
+    barTop.style.height = '0%';
+    barBottom.style.height = '0%';
+    barTop.style.transition = 'height 1s ease';
+    barBottom.style.transition = 'height 1s ease';
+
+    setTimeout(() => {
+      // Fade intro, show book
+      intro.style.transition = 'opacity 0.8s ease';
+      intro.style.opacity = '0';
+      setTimeout(() => {
+        intro.style.display = 'none';
+        bookOpen.classList.add('active');
+
+        // Trigger book opening
+        setTimeout(() => {
+          cover.classList.add('opening');
+
+          // After animation, reveal main site
+          setTimeout(() => {
+            bookOpen.style.transition = 'opacity 0.8s ease';
+            bookOpen.style.opacity = '0';
+            mainSite.classList.add('visible');
+            setTimeout(() => { bookOpen.style.display = 'none'; }, 800);
+          }, 2800);
+        }, 300);
+      }, 800);
+    }, 600);
+  });
+
+  // Chapter reader
+  let currentChapter = 0;
+  const totalChapters = 6;
+
+  const chapterLabels = [
+    'Profiles', 'Chapter 1 / 6', 'Chapter 2 / 6', 'Chapter 3 / 6',
+    'Chapter 4 / 6', 'Chapter 5 / 6', 'Chapter 6 / 6'
+  ];
+
+  function showChapter(n) {
+    // Hide current
+    document.getElementById(`ch-${currentChapter}`).classList.remove('active');
+    document.getElementById(`ch-header-${currentChapter}`).style.display = 'none';
+    document.querySelector(`[data-ch="${currentChapter}"]`).classList.remove('active');
+
+    currentChapter = n;
+
+    // Show new
+    document.getElementById(`ch-${n}`).classList.add('active');
+    document.getElementById(`ch-header-${n}`).style.display = 'block';
+    document.querySelector(`[data-ch="${n}"]`).classList.add('active');
+
+    // Update nav
+    document.getElementById('prevBtn').disabled = n === 0;
+    document.getElementById('nextBtn').disabled = n === totalChapters;
+    document.getElementById('chapterCounter').textContent = chapterLabels[n];
+
+    // Update progress bar
+    const progress = n === 0 ? 5 : (n / totalChapters) * 100;
+    document.getElementById('progressBar').style.width = progress + '%';
+
+    // Scroll to top of reader
+    document.querySelector('.chapter-reader').scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }
+
+  function changeChapter(dir) {
+    const next = currentChapter + dir;
+    if (next >= 0 && next <= totalChapters) showChapter(next);
+  }
+
+  // Rotating featured quotes
+  const quotes = [
+    { text: "Confidence and fear are louder than knowledge.", attr: "— Frankie's Notebook, Chapter 1" },
+    { text: "Confidence is fragile. Silence exposes it.", attr: "— Frankie's Notebook, Chapter 2" },
+    { text: "Loudness is fragile. Discipline is quiet.", attr: "— Esita, Chapter 3" },
+    { text: "Confidence without clarity is a ticking bomb.", attr: "— Esita, Chapter 2" },
+    { text: "Observation is greater than reaction.", attr: "— Frankie's Notebook" },
+    { text: "Sometimes the loudest voice carries the least truth.", attr: "— Esita" },
+  ];
+  let qi = 0;
+  function rotateQuote() {
+    const el = document.getElementById('featuredQuoteText');
+    const attr = document.getElementById('featuredQuoteAttr');
+    el.style.opacity = 0;
+    attr.style.opacity = 0;
+    setTimeout(() => {
+      qi = (qi + 1) % quotes.length;
+      el.textContent = quotes[qi].text;
+      attr.textContent = quotes[qi].attr;
+      el.style.transition = 'opacity 1s';
+      attr.style.transition = 'opacity 1s';
+      el.style.opacity = 1;
+      attr.style.opacity = 1;
+    }, 500);
+  }
+  setInterval(rotateQuote, 5000);
+
+  // Scroll-based reveal animations
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(e => {
+      if (e.isIntersecting) {
+        e.target.style.opacity = '1';
+        e.target.style.transform = 'translateY(0)';
+      }
+    });
+  }, { threshold: 0.1 });
+
+  document.querySelectorAll('.char-card').forEach((el, i) => {
+    el.style.opacity = '0';
+    el.style.transform = 'translateY(30px)';
+    el.style.transition = `opacity 0.7s ease ${i * 0.12}s, transform 0.7s ease ${i * 0.12}s`;
+    observer.observe(el);
+  });
+</script>
+</body>
+</html>
