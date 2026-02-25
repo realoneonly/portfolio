@@ -44,16 +44,25 @@
 
 ## Live Projects
 
+### 💎 KaysoDesigns — Premium FiveM Chains Store
+> Full e-commerce website shell for KaysoDesigns, a custom FiveM & GTA V jewelry brand. Features a product shop with chain listings and pricing, a stats section, in-game gallery showcase, customer reviews, and a bold dark aesthetic built for the FiveM community.
+
+**Type:** Freelance · **Stack:** HTML, CSS, JavaScript
+
+🔗 [View Live Site](https://realoneonly.github.io/portfolio/kaysodesigns-website-shell/)
+
+---
+
 ### 📖 Silence Is Powerful — Volume 1
 > Cinematic interactive book website for Ferry_Caddy's Wattpad story. Features a 3D book opening animation, full in-browser reader with all 6 chapters, character profiles, rotating quote sections, and a custom cursor.
 
 **Type:** Freelance · **Stack:** HTML, CSS, JavaScript
 
-🔗 [View Live Site](https://realoneonly.github.io/portfolio/silence-is-powerful/) 
+🔗 [View Live Site](https://realoneonly.github.io/portfolio/silence-is-powerful/)
 
 ---
 
-###  RealOneOnly — Website
+### RealOneOnly — Website
 > Bold, immersive website. Clean design, sharp branding, built to represent.
 
 **Type:** Personal · **Stack:** HTML, CSS, JavaScript
