@@ -58,7 +58,7 @@
 
 **Type:** Personal · **Stack:** HTML, CSS, JavaScript
 
-🔗 [View Live Site](https://realoneonly.github.io/portfolio/)
+🔗 [View Live Site](https://realoneonly.github.io/)
 
 ---
 
