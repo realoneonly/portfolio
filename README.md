@@ -1,14 +1,8 @@
 # _Extxndo — Creative Developer & Designer
 
 <div align="center">
-```
-  ███████╗██╗  ██╗████████╗██╗  ██╗███╗   ██╗██████╗  ██████╗
-  ██╔════╝╚██╗██╔╝╚══██╔══╝╚██╗██╔╝████╗  ██║██╔══██╗██╔═══██╗
-  █████╗   ╚███╔╝    ██║    ╚███╔╝ ██╔██╗ ██║██║  ██║██║   ██║
-  ██╔══╝   ██╔██╗    ██║    ██╔██╗ ██║╚██╗██║██║  ██║██║   ██║
-  ███████╗██╔╝ ██╗   ██║   ██╔╝ ██╗██║ ╚████║██████╔╝╚██████╔╝
-  ╚══════╝╚═╝  ╚═╝   ╚═╝   ╚═╝  ╚═╝╚═╝  ╚═══╝╚═════╝  ╚═════╝
-```
+
+![](https://readme-typing-svg.demolab.com?font=Fira+Code&size=40&duration=1&pause=1000&color=C9A84C&center=true&vCenter=true&repeat=false&width=600&height=80&lines=_Extxndo)
 
 **Building since 2020 · Self-Taught · Always Delivering**
 
