@@ -1,7 +1,6 @@
 # _Extxndo — Creative Developer & Designer
 
 <div align="center">
-
 ```
   ███████╗██╗  ██╗████████╗██╗  ██╗███╗   ██╗██████╗  ██████╗
   ██╔════╝╚██╗██╔╝╚══██╔══╝╚██╗██╔╝████╗  ██║██╔══██╗██╔═══██╗
@@ -43,6 +42,15 @@
 ---
 
 ## Live Projects
+
+### 💀 EVIL CORP — The Agenda
+> Cinematic data-driven website exposing real global statistics on hunger, corporate lobbying, defense spending, and food waste. Features live real-time counters, scroll-driven storytelling, and fully cited sources — all wrapped in a bold dark editorial aesthetic. No ads. No sponsors. Just the numbers.
+
+**Type:** Personal · **Stack:** HTML, CSS, JavaScript
+
+🔗 [View Live Site](https://realoneonly.github.io/portfolio/evil-corp/)
+
+---
 
 ### 💎 KaysoDesigns — Premium FiveM Chains Store
 > Full e-commerce website shell for KaysoDesigns, a custom FiveM & GTA V jewelry brand. Features a product shop with chain listings and pricing, a stats section, in-game gallery showcase, customer reviews, and a bold dark aesthetic built for the FiveM community.
